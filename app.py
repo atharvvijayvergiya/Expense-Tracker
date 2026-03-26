@@ -8,10 +8,10 @@ import os
 load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'mysecretkey123'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///expenses.db'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'mysecretkey123')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///expenses.db')
 
-db.init_app(app)
+db.init_app(app)    
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -156,7 +156,7 @@ def insights():
     client = anthropic.Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
 
     message = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-3-5-sonnet-20241022",
         max_tokens=1024,
         messages=[
             {
@@ -180,6 +180,24 @@ Keep it conversational, specific, and actionable. Format with clear sections."""
 
     analysis = message.content[0].text
     return render_template('insights.html', analysis=analysis, total=total)
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+        new_user = User(email=email, password_hash=hashed_pw)
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('Account created! Please login.')
+        return redirect(url_for('login'))
+
+    return render_template('signup.html')
 
 
 if __name__ == '__main__':
