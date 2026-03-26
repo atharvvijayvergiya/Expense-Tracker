@@ -181,24 +181,42 @@ Keep it conversational, specific, and actionable. Format with clear sections."""
     analysis = message.content[0].text
     return render_template('insights.html', analysis=analysis, total=total)
 
-
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
+        username = request.form['username']   # ✅ FIX 1: get username
         email = request.form['email']
         password = request.form['password']
 
+        # ✅ FIX 2: check if email already exists
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            flash("Email already exists. Please login.")
+            return redirect(url_for('login'))
+
+        # hash password
         hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-        new_user = User(email=email, password_hash=hashed_pw)
-        db.session.add(new_user)
-        db.session.commit()
+        try:
+            # ✅ FIX 3: include username
+            new_user = User(
+                username=username,
+                email=email,
+                password_hash=hashed_pw
+            )
 
-        flash('Account created! Please login.')
-        return redirect(url_for('login'))
+            db.session.add(new_user)
+            db.session.commit()
+
+            flash('Account created! Please login.')
+            return redirect(url_for('login'))
+
+        except Exception as e:
+            print("ERROR:", e)  # 🔥 shows in Render logs
+            db.session.rollback()
+            return "Signup failed. Try again."
 
     return render_template('signup.html')
-
 
 if __name__ == '__main__':
     app.run(debug=True)
