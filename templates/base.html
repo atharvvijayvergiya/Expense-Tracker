@@ -5,13 +5,18 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    {% if current_user.is_authenticated %}
     <nav>
-        <span>Expense Tracker</span>
-        {% if current_user.is_authenticated %}
-            <span>Hi, {{ current_user.username }}</span>
+        <span class="nav-brand">Expense Tracker</span>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">Dashboard</a>
+            <a href="{{ url_for('expenses') }}">Expenses</a>
+            <a href="{{ url_for('insights') }}">AI Insights</a>
+            <span>{{ current_user.username }}</span>
             <a href="{{ url_for('logout') }}">Logout</a>
-        {% endif %}
+        </div>
     </nav>
+    {% endif %}
     <div class="container">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
@@ -22,20 +27,5 @@
         {% endwith %}
         {% block content %}{% endblock %}
     </div>
-
-
-<nav>
-    <span>Expense Tracker</span>
-    {% if current_user.is_authenticated %}
-        <div style="display:flex; gap:20px; align-items:center;">
-            <a href="{{ url_for('home') }}" style="color:white; text-decoration:none;">Dashboard</a>
-            <a href="{{ url_for('expenses') }}" style="color:white; text-decoration:none;">Expenses</a>
-            <a href="{{ url_for('insights') }}" style="color:white; text-decoration:none;">AI Insights</a>
-            <span>Hi, {{ current_user.username }}</span>
-            <a href="{{ url_for('logout') }}">Logout</a>
-        </div>
-    {% endif %}
-</nav>
-
 </body>
 </html>

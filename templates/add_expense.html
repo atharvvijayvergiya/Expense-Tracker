@@ -1,22 +1,25 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="auth-box">
-    <h2>Add Expense</h2>
-    <form method="POST">
-        <input type="number" name="amount" placeholder="Amount (₹)" step="0.01" required>
-        <select name="category" required>
-            <option value="">Select category</option>
-            <option>Food</option>
-            <option>Transport</option>
-            <option>Shopping</option>
-            <option>Entertainment</option>
-            <option>Health</option>
-            <option>Utilities</option>
-            <option>Other</option>
-        </select>
-        <input type="text" name="description" placeholder="Description (optional)">
-        <button type="submit">Add Expense</button>
-    </form>
-    <p><a href="{{ url_for('expenses') }}">← Back to expenses</a></p>
+<div class="auth-wrapper">
+    <div class="auth-box">
+        <h2>Add Expense</h2>
+        <p class="subtitle">Log a new expense</p>
+        <form method="POST">
+            <input type="number" name="amount" placeholder="Amount (₹)" step="0.01" required>
+            <select name="category" required>
+                <option value="">Select category</option>
+                <option>Food</option>
+                <option>Transport</option>
+                <option>Shopping</option>
+                <option>Entertainment</option>
+                <option>Health</option>
+                <option>Utilities</option>
+                <option>Other</option>
+            </select>
+            <input type="text" name="description" placeholder="Description (optional)">
+            <button type="submit">Add Expense</button>
+        </form>
+        <p><a href="{{ url_for('expenses') }}">← Back to expenses</a></p>
+    </div>
 </div>
 {% endblock %}

@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+<div class="page-header">
     <h2>Your Expenses</h2>
     <a href="{{ url_for('add_expense') }}" class="btn">+ Add Expense</a>
 </div>
 
-<div class="card" style="margin-bottom:20px;">
-    <form method="GET" action="{{ url_for('expenses') }}" style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
-        <div>
-            <label style="font-size:12px; color:#666; display:block; margin-bottom:4px;">Category</label>
+<div class="card">
+    <form method="GET" action="{{ url_for('expenses') }}" class="filter-form">
+        <div class="filter-group">
+            <label>Category</label>
             <select name="category">
                 <option value="">All categories</option>
                 {% for cat in ['Food','Transport','Shopping','Entertainment','Health','Utilities','Other'] %}
@@ -17,24 +17,30 @@
                 {% endfor %}
             </select>
         </div>
-        <div>
-            <label style="font-size:12px; color:#666; display:block; margin-bottom:4px;">From</label>
-            <input type="date" name="start_date" value="{{ start_date }}" style="padding:8px; border:1px solid #ddd; border-radius:6px;">
+        <div class="filter-group">
+            <label>From</label>
+            <input type="date" name="start_date" value="{{ start_date }}">
         </div>
-        <div>
-            <label style="font-size:12px; color:#666; display:block; margin-bottom:4px;">To</label>
-            <input type="date" name="end_date" value="{{ end_date }}" style="padding:8px; border:1px solid #ddd; border-radius:6px;">
+        <div class="filter-group">
+            <label>To</label>
+            <input type="date" name="end_date" value="{{ end_date }}">
         </div>
-        <button type="submit" class="btn">Filter</button>
-        <a href="{{ url_for('expenses') }}" style="padding:10px 16px; font-size:14px; color:#666;">Clear</a>
+        <div class="filter-group">
+            <label>&nbsp;</label>
+            <button type="submit" class="btn">Filter</button>
+        </div>
+        <div class="filter-group">
+            <label>&nbsp;</label>
+            <a href="{{ url_for('expenses') }}" class="btn-ghost">Clear</a>
+        </div>
     </form>
 </div>
 
 {% if expenses %}
 <div class="card">
-    <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
-        <span style="font-size:14px; color:#666;">{{ expenses|length }} expense(s) found</span>
-        <span style="font-weight:500;">Total: ₹{{ "%.2f"|format(total) }}</span>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <span style="font-size:13px; color:#555;">{{ expenses|length }} expense(s)</span>
+        <span style="font-size:15px; font-weight:600; color:#d4a843;">Total: ₹{{ "%.2f"|format(total) }}</span>
     </div>
     <table>
         <thead>
@@ -51,8 +57,8 @@
             <tr>
                 <td>{{ expense.date.strftime('%d %b %Y') }}</td>
                 <td><span class="badge">{{ expense.category }}</span></td>
-                <td>{{ expense.description or '—' }}</td>
-                <td>₹{{ "%.2f"|format(expense.amount) }}</td>
+                <td style="color:#888;">{{ expense.description or '—' }}</td>
+                <td style="font-weight:500; color:#e8e8e8;">₹{{ "%.2f"|format(expense.amount) }}</td>
                 <td><a href="{{ url_for('delete_expense', expense_id=expense.id) }}" class="delete">Delete</a></td>
             </tr>
             {% endfor %}
@@ -60,8 +66,9 @@
     </table>
 </div>
 {% else %}
-<div class="card">
-    <p>No expenses found. <a href="{{ url_for('add_expense') }}">Add your first one →</a></p>
+<div class="card" style="text-align:center; padding:48px;">
+    <p style="color:#555; margin-bottom:16px;">No expenses found.</p>
+    <a href="{{ url_for('add_expense') }}" class="btn">Add your first one</a>
 </div>
 {% endif %}
 
