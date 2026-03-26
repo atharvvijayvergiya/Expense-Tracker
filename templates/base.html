@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <span>Expense Tracker</span>
+        {% if current_user.is_authenticated %}
+            <span>Hi, {{ current_user.username }}</span>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% endif %}
+    </nav>
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+
+
+<nav>
+    <span>Expense Tracker</span>
+    {% if current_user.is_authenticated %}
+        <div style="display:flex; gap:20px; align-items:center;">
+            <a href="{{ url_for('home') }}" style="color:white; text-decoration:none;">Dashboard</a>
+            <a href="{{ url_for('expenses') }}" style="color:white; text-decoration:none;">Expenses</a>
+            <a href="{{ url_for('insights') }}" style="color:white; text-decoration:none;">AI Insights</a>
+            <span>Hi, {{ current_user.username }}</span>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    {% endif %}
+</nav>
+
+</body>
+</html>

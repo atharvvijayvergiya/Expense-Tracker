@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2 style="margin-bottom:24px;">Dashboard</h2>
+
+<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px;">
+    <div class="stat-card">
+        <div class="stat-label">Total spent</div>
+        <div class="stat-value">₹{{ "%.2f"|format(total_spent) }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total expenses</div>
+        <div class="stat-value">{{ expense_count }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Top category</div>
+        <div class="stat-value">{{ top_category }}</div>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px;">
+    <div class="card">
+        <h3 style="margin-bottom:16px; font-size:15px;">Spending by category</h3>
+        <canvas id="pieChart"></canvas>
+    </div>
+    <div class="card">
+        <h3 style="margin-bottom:16px; font-size:15px;">Monthly spending</h3>
+        <canvas id="barChart"></canvas>
+    </div>
+</div>
+
+<div style="text-align:center;">
+    <a href="{{ url_for('add_expense') }}" class="btn" style="margin-right:12px;">+ Add Expense</a>
+    <a href="{{ url_for('expenses') }}" class="btn" style="background:#6b7280;">View All Expenses</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    new Chart(pieCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ category_labels | tojson }},
+            datasets: [{
+                data: {{ category_values | tojson }},
+                backgroundColor: ['#4f46e5','#7c3aed','#a855f7','#ec4899','#f43f5e','#f97316','#eab308'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ monthly_labels | tojson }},
+            datasets: [{
+                label: 'Amount (₹)',
+                data: {{ monthly_values | tojson }},
+                backgroundColor: '#4f46e5',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+</script>
+
+<a href="{{ url_for('insights') }}" class="btn" style="background:#7c3aed;">AI Insights</a>
+
+{% endblock %}

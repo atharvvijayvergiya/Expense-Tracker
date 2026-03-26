@@ -1,0 +1,48 @@
+@app.route('/insights')
+@login_required
+def insights():
+    import anthropic
+
+    expenses = Expense.query.filter_by(user_id=current_user.id).all()
+
+    if not expenses:
+        flash('Add some expenses first to get insights.')
+        return redirect(url_for('home'))
+
+    expense_summary = []
+    for e in expenses:
+        expense_summary.append(f"{e.category}: ₹{e.amount} — {e.description or 'no description'}")
+
+    expense_text = "\n".join(expense_summary)
+    total = sum(e.amount for e in expenses)
+
+    try:
+        client = anthropic.Anthropic(api_key=os.getenv('ANTHROPIC_API_KEY'))
+        message = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=1024,
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"""Here are my recent expenses:
+
+{expense_text}
+
+Total spent: ₹{total}
+
+Please analyze my spending and tell me:
+1. Where I am spending the most and why it might be a problem
+2. Which specific expenses I can cut down
+3. Practical alternative suggestions to reduce costs
+4. One key habit I should change
+
+Keep it conversational, specific, and actionable. Format with clear sections."""
+                }
+            ]
+        )
+        analysis = message.content[0].text
+
+    except Exception as e:
+        analysis = "AI insights are currently unavailable. Please check your API credits and try again."
+
+    return render_template('insights.html', analysis=analysis, total=total)

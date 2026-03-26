@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+    <h2>Your Expenses</h2>
+    <a href="{{ url_for('add_expense') }}" class="btn">+ Add Expense</a>
+</div>
+
+<div class="card" style="margin-bottom:20px;">
+    <form method="GET" action="{{ url_for('expenses') }}" style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+        <div>
+            <label style="font-size:12px; color:#666; display:block; margin-bottom:4px;">Category</label>
+            <select name="category">
+                <option value="">All categories</option>
+                {% for cat in ['Food','Transport','Shopping','Entertainment','Health','Utilities','Other'] %}
+                    <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label style="font-size:12px; color:#666; display:block; margin-bottom:4px;">From</label>
+            <input type="date" name="start_date" value="{{ start_date }}" style="padding:8px; border:1px solid #ddd; border-radius:6px;">
+        </div>
+        <div>
+            <label style="font-size:12px; color:#666; display:block; margin-bottom:4px;">To</label>
+            <input type="date" name="end_date" value="{{ end_date }}" style="padding:8px; border:1px solid #ddd; border-radius:6px;">
+        </div>
+        <button type="submit" class="btn">Filter</button>
+        <a href="{{ url_for('expenses') }}" style="padding:10px 16px; font-size:14px; color:#666;">Clear</a>
+    </form>
+</div>
+
+{% if expenses %}
+<div class="card">
+    <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+        <span style="font-size:14px; color:#666;">{{ expenses|length }} expense(s) found</span>
+        <span style="font-weight:500;">Total: ₹{{ "%.2f"|format(total) }}</span>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.date.strftime('%d %b %Y') }}</td>
+                <td><span class="badge">{{ expense.category }}</span></td>
+                <td>{{ expense.description or '—' }}</td>
+                <td>₹{{ "%.2f"|format(expense.amount) }}</td>
+                <td><a href="{{ url_for('delete_expense', expense_id=expense.id) }}" class="delete">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <p>No expenses found. <a href="{{ url_for('add_expense') }}">Add your first one →</a></p>
+</div>
+{% endif %}
+
+{% endblock %}
